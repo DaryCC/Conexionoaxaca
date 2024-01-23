@@ -17,6 +17,9 @@ import csv
 import requests
 import pywhatkit as kit
 import tkinter as Tkinter
+from unidecode import unidecode
+
+
 chromeDriver = webdriver.Chrome()
 
 chromeDriver.get("https://www.quepasaoaxaca.com/es/guia-de-eventos/")
@@ -176,6 +179,24 @@ def download_images_from_csv(csv_file='eventos.csv', download_folder='images'):
 # Example usage
 download_images_from_csv(csv_file='eventos.csv', download_folder='images')
 
+def remove_accents(csv_file):
+    # Read data from CSV file
+    df = pd.read_csv(csv_file)
+
+    # Specify columns with 'object' data type to convert to string
+    columns_to_convert = ['evento', 'fecha', 'hora', 'lugar', 'direccion','url_of_the_image']
+
+    # Convert specified columns to string and remove accents
+    for col in columns_to_convert:
+        df[col] = df[col].astype(str).apply(unidecode)
+
+    # Save the modified DataFrame to a new CSV file or update the existing one
+    df.to_csv('modified_file.csv', index=False)
+
+# Example usage
+csv_file_path = 'your_file.csv'  # Replace with the actual path to your CSV file
+remove_accents('eventos.csv')
+
 
 # para enviar a grupos de whatsapp
 
@@ -186,11 +207,17 @@ download_images_from_csv(csv_file='eventos.csv', download_folder='images')
 def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
     # Read data from CSV file import tkinter as Tkinter
     df = pd.read_csv(csv_file)
-
+    print(df.dtypes)
     # Iterate through each row in the CSV file
     for _, row in df.iterrows():
         # Format the message
-        message = f"Evento: {row['evento']}\nFecha: {row['fecha']}\nHora: {row['hora']}\nLugar: {row['lugar']}\nDirección: {row['direccion']}"
+
+        for key in row:
+            print(key)
+            if key=='nan':
+                row[key]=''
+
+        message = f"Evento: {row['evento']}\nFecha: {row['fecha']}\nHora: {row['hora']}\nLugar: {row['lugar']}\nDireccion: {row['direccion']}"
 
         # Find the image path
         image_index = row.name
@@ -211,11 +238,13 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
         # kit.sendwhats_image("Posada 2016", image_path, message)
         # I0QVhEjPeNu1D11Yn6U86f
         # test buddy system
-        kit.sendwhats_image("LpGg58gwpTPKGhoUOfwHtP",image_path,message,15,True, 2)
-        # kit.sendwhats_image("I0QVhEjPeNu1D11Yn6U86f",image_path,message,20,True, 5)
+        #diversión GNMmyHAdwSgElxJtecDgQo
+        #posada LpGg58gwpTPKGhoUOfwHtP
+        kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,10,True,10)
+        #:kit.sendwhats_image("I0QVhEjPeNu1D11Yn6U86f",image_path,message,20,True, 5)
 
 
 # Example usage
-post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images')
+post_event_to_whatsapp(csv_file='modified_file.csv', images_folder='images')
 
 
