@@ -5,8 +5,10 @@ __pycache__/
 
 # C extensions
 *.so
-
+eventos.csv
+PyWhatKit_DB.txt
 # Distribution / packaging
+
 .Python
 build/
 develop-eggs/
@@ -16,6 +18,8 @@ eggs/
 .eggs/
 lib/
 lib64/
+images_folder
+images
 parts/
 sdist/
 var/

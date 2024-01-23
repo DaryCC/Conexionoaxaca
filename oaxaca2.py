@@ -1,6 +1,7 @@
-
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 import bs4
+import os
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, WebDriverException
 import pandas as pd
@@ -12,7 +13,10 @@ from selenium.webdriver.support import expected_conditions as ExpectedCond
 import json
 import re
 from datetime import datetime
-
+import csv
+import requests
+import pywhatkit as kit
+import tkinter as Tkinter
 chromeDriver = webdriver.Chrome()
 
 chromeDriver.get("https://www.quepasaoaxaca.com/es/guia-de-eventos/")
@@ -28,24 +32,25 @@ except TimeoutException:
     chromeDriver.quit()
 
 
-
-# element=chromeDriver.find_element("class name","evoet_title")
-# print(element)
-# print(getElembyLinkText)
 page = BeautifulSoup(chromeDriver.page_source,'html.parser')
 # print(page)
-
+#obtemos todos la información necesaria en  script/json
 data = [
     json.loads(x.string) for x in page.find_all("script", type="application/ld+json")
 ]
 
-# print(type(data))
 today_date= datetime.now().strftime("%Y-%-m-%d")
 #print(today_date)
-# Create a regular expression pattern
+
+# Create a regular expression pattern para extrer las fechas, excluyendo la hora
 pattern = re.compile(r"(\d{4}-\d{1,2}-\d{1,2})(T\d{2}:\d{2}-\d{1,2}:\d{2})?")
 
-
+nombre_evento =[]
+fecha_evento=[]
+hora_evento=[]
+lugar_evento=[]
+direccion_evento=[]
+flyer_evento=[]
 
 for evento in data:
     match = pattern.search(evento['startDate'])
@@ -60,33 +65,157 @@ for evento in data:
 
             print("===========================")
 
-            try:
-                evento['location']
-                # print(evento['location'])
-                print("Esto deberia de imprimir algo")
-                for lugar in evento["location"]:
-                    print(lugar['name'])
-                    print(lugar['address']['streetAddress'])
-            except KeyError:
-                print('location is not available')
-
             evento['startDate']=today_date
             # print(f"Match found: {today_date} is equal to {extracted_date}")
             #clean name from '&quot'
             clean_name = evento['name'].replace("&quot;", "")
             evento["name"]=clean_name
+
             print(evento['name'])
             print(evento['startDate'])
+
+            if evento['name']:
+                nombre_evento.append(evento['name'])
+            else: nombre_evento.append('')
+
+
+            if evento['startDate']:
+                fecha_evento.append(evento['startDate'])
+            else: fecha_evento.append('')
+
+
             if extracted_time:
-                # Parse the time string and format it
+
                 # Create a regular expression pattern to extract the string between "T" and "-"
                 between_pattern = re.compile(r"T([^-\s]+)-")
                 between_match = between_pattern.search(extracted_time)
 
                 print(between_match.group(1))
+                hora_evento.append(between_match.group(1))
             else:
                 print("")
+                hora_evento.append('')
 
+
+            try:
+                evento['location']
+                # print(evento['location'])
+                # print("Esto deberia de imprimir algo")
+                for lugar in evento["location"]:
+                    print(lugar['name'])
+                    lugar_evento.append(lugar['name'])
+                    print(lugar['address']['streetAddress'])
+                    direccion_evento.append(lugar['address']['streetAddress'])
+            except KeyError:
+                print('')
+                lugar_evento.append('')
+                direccion_evento.append('')
+
+            imagen_input = evento['description']
+            link_imagen = BeautifulSoup(imagen_input,'html.parser')
+            img_url= link_imagen.find('img')['src']
+            if img_url:
+                flyer_evento.append(img_url)
+            else:
+                flyer_evento.append('')
+            print(img_url)
 
             # print(evento['description'])
             # print(evento[])
+
+#crear data frame en pandas
+eventos_del_dia =  pd.DataFrame({
+
+    "evento":nombre_evento,
+    'fecha':fecha_evento,
+    'hora':hora_evento,
+    'lugar':lugar_evento,
+    "direccion":direccion_evento,
+    'url_of_the_image':flyer_evento,
+})
+
+print(eventos_del_dia)
+
+cwd = os.getcwd()
+path = cwd +"/eventos.csv"
+eventos_del_dia.to_csv(path,index=False,header=True,encoding='utf-8-sig',index_label='index_imagen')
+
+
+
+def download_images_from_csv(csv_file='eventos.csv', download_folder='images'):
+    # Read data from CSV file
+    df = pd.read_csv(csv_file)
+
+    # Create the download folder if it doesn't exist
+    os.makedirs(download_folder, exist_ok=True)
+
+    # Iterate through each row in the CSV file
+    for index, row in df.iterrows():
+        # Get the URL of the image from the "url_of_the_image" column
+        image_url = row['url_of_the_image']
+        print(image_url)
+        # Ensure the URL is not empty
+        if pd.notna(image_url) and isinstance(image_url, str):
+            # Get the file extension from the URL
+            file_extension = os.path.splitext(urlparse(image_url).path)[1]
+
+            # Construct the filename using the index from the CSV file
+            filename = f"{download_folder}/image_{index}{file_extension}"
+
+            # Download the image and save it with the constructed filename
+            response = requests.get(image_url)
+            if response.status_code == 200:
+                with open(filename, 'wb') as file:
+                    file.write(response.content)
+                print(f"Image {index} downloaded: {filename}")
+            else:
+                print(f"Failed to download image {index} from {image_url}")
+        else:
+            print(f"Skipping row {index} due to missing or invalid image URL")
+
+# Example usage
+download_images_from_csv(csv_file='eventos.csv', download_folder='images')
+
+
+# para enviar a grupos de whatsapp
+
+#istala tkinter para linux o windows?, solo importa la librería
+# import tkinter as Tkinter
+#en arch sudo pacman -S tk
+
+def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
+    # Read data from CSV file import tkinter as Tkinter
+    df = pd.read_csv(csv_file)
+
+    # Iterate through each row in the CSV file
+    for _, row in df.iterrows():
+        # Format the message
+        message = f"Evento: {row['evento']}\nFecha: {row['fecha']}\nHora: {row['hora']}\nLugar: {row['lugar']}\nDirección: {row['direccion']}"
+
+        # Find the image path
+        image_index = row.name
+        image_path = None
+
+        for ext in ['jpg', 'jpeg', 'png']:
+            potential_image_path = os.path.join(images_folder, f"image_{image_index}.{ext}")
+            if os.path.exists(potential_image_path):
+                image_path = potential_image_path
+                break
+
+        if image_path is None:
+            print(f"Image not found for event {image_index}")
+            continue
+
+        print(" ok si funciona hasta antes de enviar imagen")
+        # Send the message with the image to WhatsApp group
+        # kit.sendwhats_image("Posada 2016", image_path, message)
+        # I0QVhEjPeNu1D11Yn6U86f
+        # test buddy system
+        kit.sendwhats_image("LpGg58gwpTPKGhoUOfwHtP",image_path,message,15,True, 2)
+        # kit.sendwhats_image("I0QVhEjPeNu1D11Yn6U86f",image_path,message,20,True, 5)
+
+
+# Example usage
+post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images')
+
+
