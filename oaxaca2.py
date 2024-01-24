@@ -239,9 +239,10 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
         # I0QVhEjPeNu1D11Yn6U86f
         # test buddy system
         #diversión GNMmyHAdwSgElxJtecDgQo
-        #posada LpGg58gwpTPKGhoUOfwHtP
-        kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,10,True,10)
-        #:kit.sendwhats_image("I0QVhEjPeNu1D11Yn6U86f",image_path,message,20,True, 5)
+        #diversioón
+        # kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,10,True,10)
+        #posada
+        kit.sendwhats_image("LpGg58gwpTPKGhoUOfwHtP",image_path,message,20,True, 5)
 
 
 # Example usage
