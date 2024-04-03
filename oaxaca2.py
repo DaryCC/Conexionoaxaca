@@ -41,9 +41,14 @@ page = BeautifulSoup(chromeDriver.page_source,'html.parser')
 data = [
     json.loads(x.string) for x in page.find_all("script", type="application/ld+json")
 ]
-
+# print(data)
 today_date= datetime.now().strftime("%Y-%-m-%d")
-#print(today_date)
+# print(type(today_date))
+# print(today_date)
+today_date=('2024-4-3')
+
+
+
 
 # Create a regular expression pattern para extrer las fechas, excluyendo la hora
 pattern = re.compile(r"(\d{4}-\d{1,2}-\d{1,2})(T\d{2}:\d{2}-\d{1,2}:\d{2})?")
@@ -60,10 +65,15 @@ for evento in data:
     # print(evento['location'])
 
     if match :
+        print('si hay eventos de este día')
         extracted_date = match.group(1)
         extracted_time = match.group(2)
-
-
+        print('fecha extraida de hoy')
+        print(extracted_date)
+        print('fecha de hoy sys')
+        print(today_date)
+        print('hora de hoy')
+        print(extracted_time)
         if today_date == extracted_date:
 
             print("===========================")
@@ -116,12 +126,16 @@ for evento in data:
 
             imagen_input = evento['description']
             link_imagen = BeautifulSoup(imagen_input,'html.parser')
-            img_url= link_imagen.find('img')['src']
-            if img_url:
-                flyer_evento.append(img_url)
-            else:
-                flyer_evento.append('')
-            print(img_url)
+            print(link_imagen)
+            if len(link_imagen)> 1 :
+                print(len(link_imagen))
+                print('si paso la condicion y no tiene informacion')
+                img_url= link_imagen.find('img')['src']
+                if img_url:
+                    flyer_evento.append(img_url)
+                else:
+                    flyer_evento.append('')
+                print(img_url)
 
             # print(evento['description'])
             # print(evento[])
@@ -217,7 +231,8 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
             if key=='nan':
                 row[key]=''
 
-        message = f"Evento: {row['evento']}\nFecha: {row['fecha']}\nHora: {row['hora']}\nLugar: {row['lugar']}\nDireccion: {row['direccion']}"
+        # message = f"Evento: {row['evento']}\nFecha: {row['fecha']}\nHora: {row['hora']}\nLugar: {row['lugar']}\nDireccion: {row['direccion']}"
+        message = f"Evento: {row['evento']}\nHora: {row['hora']}\nLugar: {row['lugar']}"
 
         # Find the image path
         image_index = row.name
@@ -240,9 +255,9 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
         # test buddy system
         #diversión GNMmyHAdwSgElxJtecDgQo
         #diversioón
-        # kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,10,True,10)
+        kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,15,True,10)
         #posada
-        kit.sendwhats_image("LpGg58gwpTPKGhoUOfwHtP",image_path,message,20,True, 5)
+        # kit.sendwhats_image("LpGg58gwpTPKGhoUOfwHtP",image_path,message,20,True, 5)
 
 
 # Example usage
