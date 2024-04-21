@@ -42,10 +42,10 @@ data = [
     json.loads(x.string) for x in page.find_all("script", type="application/ld+json")
 ]
 # print(data)
-today_date= datetime.now().strftime("%Y-%-m-%d")
+today_date= datetime.now().strftime("%Y-%m-%d")
 # print(type(today_date))
 # print(today_date)
-today_date=('2024-4-3')
+today_date=('2024-4-21')
 
 
 
