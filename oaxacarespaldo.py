@@ -22,8 +22,6 @@ from unidecode import unidecode
 
 chromeDriver = webdriver.Chrome()
 
-
-
 chromeDriver.get("https://www.quepasaoaxaca.com/es/guia-de-eventos/")
 
 
@@ -39,27 +37,16 @@ except TimeoutException:
 
 page = BeautifulSoup(chromeDriver.page_source,'html.parser')
 # print(page)
-# print(page.find_all("script", type="application/ld+json"))
-data=[]
-for x in page.find_all('script', type="application/ld+json"):
-    try:
-        json_data = json.loads(x.string)
-        data.append(json_data)
-    except json.JSONDecodeError as e:
-        print(f"Error al decodificar JSON: {e}")
-        print(f"Contenido del JSON problemático: {x.string}")
-
+print(page.find_all("script", type="application/ld+json"))
 #obtemos todos la información necesaria en  script/json
-# data = [
-#     json.loads(x.string) for x in page.find_all('script', type="application/ld+json")
-# ]
+data = [
+    json.loads(x.string) for x in page.find_all('script', type="application/ld+json")
+]
 # print(data)
-# today_date= datetime.now().strftime("%Y-%m-%d")
-# today_date = datetime.now().strftime("%Y-%-m-%-d")
-today_date = date.today().strftime("%Y-%#m-%#d")
+today_date= datetime.now().strftime("%Y-%m-%d")
 # print(type(today_date))
-print(today_date)
-# today_date=('2024-8-27')
+# print(today_date)
+today_date=('2024-8-17')
 
 
 
