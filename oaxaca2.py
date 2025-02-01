@@ -237,8 +237,8 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
     print("*****************************************************")
     df = pd.read_csv(csv_file)
     print(df.dtypes)
-    kit.sendwhatmsg_to_group_instantly("GNMmyHAdwSgElxJtecDgQo", "Para mas detalles consulta \n www.oaxacaevents.com  \n www.quepasaoaxaca.com \n automated by @mezcalspeaks")
-    time.sleep(10)
+    kit.sendwhatmsg_to_group_instantly("GNMmyHAdwSgElxJtecDgQo", "Para mas detalles consulta \n www.oaxacaevents.com  \n www.quepasaoaxaca.com \n automated by @luditalk")
+    time.sleep(20)
     # Iterate through each row in the CSV file
     for _, row in df.iterrows():
         # Format the message
@@ -272,7 +272,7 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
         # test buddy system
         #diversión GNMmyHAdwSgElxJtecDgQo
         #diversioón
-        kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,20,True,20)
+        kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,40,True,40)
         #posada
         # kit.sendwhats_image("LpGg58gwpTPKGhoUOfwHtP",image_path,message,20,True, 5)
 
