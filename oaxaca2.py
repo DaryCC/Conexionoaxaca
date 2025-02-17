@@ -22,12 +22,14 @@ from unidecode import unidecode
 
 chromeDriver = webdriver.Chrome()
 
+
+
 chromeDriver.get("https://www.quepasaoaxaca.com/es/guia-de-eventos/")
 
 
 try:
-    getElembyLinkText = WebDriverWait(chromeDriver, 20).until(ExpectedCond.presence_of_element_located((By.CLASS_NAME, "evoday_events")))
-
+    getElembyLinkText = WebDriverWait(chromeDriver, 20).until(ExpectedCond.presence_of_element_located((By.CLASS_NAME, "eventon_desc_in")))
+    # getElembyLinkText = WebDriverWait(chromeDriver, 20).until(ExpectedCond.presence_of_element_located((By.CLASS_NAME, "evoday_events")))
     print(" El elemento si se encontró")
 
 except TimeoutException:
@@ -37,15 +39,30 @@ except TimeoutException:
 
 page = BeautifulSoup(chromeDriver.page_source,'html.parser')
 # print(page)
+# print(page.find_all("script", type="application/ld+json"))
+data=[]
+for x in page.find_all('script', type="application/ld+json"):
+    try:
+        json_data = json.loads(x.string)
+        data.append(json_data)
+    except json.JSONDecodeError as e:
+        print(f"Error al decodificar JSON: {e}")
+        print(f"Contenido del JSON problemático: {x.string}")
+
 #obtemos todos la información necesaria en  script/json
-data = [
-    json.loads(x.string) for x in page.find_all("script", type="application/ld+json")
-]
+# data = [
+#     json.loads(x.string) for x in page.find_all('script', type="application/ld+json")
+# ]
 # print(data)
-today_date= datetime.now().strftime("%Y-%-m-%d")
-# print(type(today_date))
-# print(today_date)
-today_date=('2024-4-3')
+
+# Extraer la fecha en el formato yyyy-m-d sin ceros a la izquierda
+today_date = datetime.now().strftime("%Y-%-m-%-d")
+#para windows es así
+# now = datetime.now()
+# today_date = f"{now.year}-{now.month}-{now.day}"
+
+print(today_date)
+# today_date=('2024-8-27')
 
 
 
@@ -68,12 +85,12 @@ for evento in data:
         print('si hay eventos de este día')
         extracted_date = match.group(1)
         extracted_time = match.group(2)
-        print('fecha extraida de hoy')
+        print('fecha extraida de pagina')
         print(extracted_date)
-        print('fecha de hoy sys')
-        print(today_date)
-        print('hora de hoy')
-        print(extracted_time)
+        # print('fecha de hoy sys')
+        # print(today_date)
+        # print('hora de hoy')
+        # print(extracted_time)
         if today_date == extracted_date:
 
             print("===========================")
@@ -220,8 +237,11 @@ remove_accents('eventos.csv')
 
 def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
     # Read data from CSV file import tkinter as Tkinter
+    print("*****************************************************")
     df = pd.read_csv(csv_file)
     print(df.dtypes)
+    kit.sendwhatmsg_to_group_instantly("GNMmyHAdwSgElxJtecDgQo", "Para mas detalles consulta \n www.oaxacaevents.com  \n www.quepasaoaxaca.com \n automated by @luditalk")
+    time.sleep(20)
     # Iterate through each row in the CSV file
     for _, row in df.iterrows():
         # Format the message
@@ -247,7 +267,7 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
         if image_path is None:
             print(f"Image not found for event {image_index}")
             continue
-
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         print(" ok si funciona hasta antes de enviar imagen")
         # Send the message with the image to WhatsApp group
         # kit.sendwhats_image("Posada 2016", image_path, message)
@@ -255,12 +275,13 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
         # test buddy system
         #diversión GNMmyHAdwSgElxJtecDgQo
         #diversioón
-        kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,15,True,10)
+        kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,20,True,20)
         #posada
         # kit.sendwhats_image("LpGg58gwpTPKGhoUOfwHtP",image_path,message,20,True, 5)
 
 
 # Example usage
 post_event_to_whatsapp(csv_file='modified_file.csv', images_folder='images')
+
 
 
