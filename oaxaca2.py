@@ -240,8 +240,8 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
     print("*****************************************************")
     df = pd.read_csv(csv_file)
     print(df.dtypes)
-    kit.sendwhatmsg_to_group_instantly("GNMmyHAdwSgElxJtecDgQo", "Para mas detalles consulta \n www.oaxacaevents.com  \n www.quepasaoaxaca.com \n automated by @luditalk")
-    time.sleep(20)
+    kit.sendwhatmsg_to_group_instantly("I1c3J3hIBnNASIzhn4Q9MK", "Para mas detalles consulta \n www.oaxacaevents.com  \n www.quepasaoaxaca.com \n automated by @luditalk")
+    time.sleep(10)
     # Iterate through each row in the CSV file
     for _, row in df.iterrows():
         # Format the message
@@ -253,6 +253,7 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
 
         # message = f"Evento: {row['evento']}\nFecha: {row['fecha']}\nHora: {row['hora']}\nLugar: {row['lugar']}\nDireccion: {row['direccion']}"
         message = f"Evento: {row['evento']}\nHora: {row['hora']}\nLugar: {row['lugar']}"
+        #message = f"Evento: {row['evento']}\nHora: {row['hora']}\nLugar: {row['lugar']}"
 
         # Find the image path
         image_index = row.name
@@ -275,7 +276,10 @@ def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
         # test buddy system
         #diversión GNMmyHAdwSgElxJtecDgQo
         #diversioón
-        kit.sendwhats_image("GNMmyHAdwSgElxJtecDgQo",image_path,message,20,True,20)
+        # Reducir el tiempo de espera entre mensajes
+        # kit.sendwhats_image("I1c3J3hIBnNASIzhn4Q9MK", image_path, message, 8, False, 1)
+        kit.sendwhats_image("I1c3J3hIBnNASIzhn4Q9MK", image_path, message)
+
         #posada
         # kit.sendwhats_image("LpGg58gwpTPKGhoUOfwHtP",image_path,message,20,True, 5)
 
@@ -285,3 +289,4 @@ post_event_to_whatsapp(csv_file='modified_file.csv', images_folder='images')
 
 
 
+    
