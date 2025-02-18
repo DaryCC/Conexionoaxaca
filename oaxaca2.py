@@ -236,52 +236,37 @@ remove_accents('eventos.csv')
 #en arch sudo pacman -S tk
 
 def post_event_to_whatsapp(csv_file='eventos.csv', images_folder='images'):
-    # Read data from CSV file import tkinter as Tkinter
-    print("*****************************************************")
     df = pd.read_csv(csv_file)
-    print(df.dtypes)
-    kit.sendwhatmsg_to_group_instantly("I1c3J3hIBnNASIzhn4Q9MK", "Para mas detalles consulta \n www.oaxacaevents.com  \n www.quepasaoaxaca.com \n automated by @luditalk")
-    time.sleep(10)
-    # Iterate through each row in the CSV file
+    
+    # Envía mensaje inicial al grupo
+    kit.sendwhatmsg_to_group_instantly(
+        "I1c3J3hIBnNASIzhn4Q9MK", 
+        "Para mas detalles consulta \n www.oaxacaevents.com  \n www.quepasaoaxaca.com \n automated by @luditalk"
+    )
+    time.sleep(1)  # Espera prudencial entre mensajes
+
+    # Itera sobre cada evento
     for _, row in df.iterrows():
-        # Format the message
-
-        for key in row:
-            print(key)
-            if key=='nan':
-                row[key]=''
-
-        # message = f"Evento: {row['evento']}\nFecha: {row['fecha']}\nHora: {row['hora']}\nLugar: {row['lugar']}\nDireccion: {row['direccion']}"
+        # Formatea el mensaje
         message = f"Evento: {row['evento']}\nHora: {row['hora']}\nLugar: {row['lugar']}"
-        #message = f"Evento: {row['evento']}\nHora: {row['hora']}\nLugar: {row['lugar']}"
-
-        # Find the image path
+        
+        # Busca la imagen correspondiente
         image_index = row.name
         image_path = None
-
         for ext in ['jpg', 'jpeg', 'png']:
             potential_image_path = os.path.join(images_folder, f"image_{image_index}.{ext}")
             if os.path.exists(potential_image_path):
                 image_path = potential_image_path
                 break
 
-        if image_path is None:
-            print(f"Image not found for event {image_index}")
-            continue
-        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        print(" ok si funciona hasta antes de enviar imagen")
-        # Send the message with the image to WhatsApp group
-        # kit.sendwhats_image("Posada 2016", image_path, message)
-        # I0QVhEjPeNu1D11Yn6U86f
-        # test buddy system
-        #diversión GNMmyHAdwSgElxJtecDgQo
-        #diversioón
-        # Reducir el tiempo de espera entre mensajes
-        # kit.sendwhats_image("I1c3J3hIBnNASIzhn4Q9MK", image_path, message, 8, False, 1)
-        kit.sendwhats_image("I1c3J3hIBnNASIzhn4Q9MK", image_path, message)
-
-        #posada
-        # kit.sendwhats_image("LpGg58gwpTPKGhoUOfwHtP",image_path,message,20,True, 5)
+        if image_path:
+            # Envía imagen con mensaje
+            kit.sendwhats_image(
+                "I1c3J3hIBnNASIzhn4Q9MK", 
+                image_path, 
+                message
+            )
+            time.sleep(1)  # Espera entre mensajes
 
 
 # Example usage
@@ -289,4 +274,4 @@ post_event_to_whatsapp(csv_file='modified_file.csv', images_folder='images')
 
 
 
-    
+    # I1c3J3hIBnNASIzhn4Q9MK
